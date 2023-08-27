@@ -19,7 +19,7 @@ import delay from 'delay';
 import cron from 'node-cron'
 import 'dotenv/config'
 
-cron.schedule('1 * * * *', () => {
+cron.schedule('* * * * *', () => {
   (async () => {
     try {
       const {ThreadsAPI} = Threads;
@@ -49,8 +49,8 @@ cron.schedule('1 * * * *', () => {
           const response = res.text
 
 
-          //delay for 3 minutes
-          await delay(30000);
+          //delay for 1 minute
+          await delay(60000);
 
           //reply to thread
           await threadsAPI.publish({
