@@ -41,24 +41,26 @@ cron.schedule('* * * * *', () => {
       if (data&&data.new_stories) {
         for await (let notification of data.new_stories) {
           let mention = notification.args
-          let parentPostID = mention.destination.split('media?id=')[1]
-          parentPostID = parentPostID.split('_' + mention.profile_id)[0]
-          let post = await threadsAPI.getThreads(parentPostID);
-          let caption = post.containing_thread.thread_items[0].post.caption.text
-          const res = await api.sendMessage(`write a sarcastic joke to "${caption}"`)
-          const response = res.text
+          if (mention.extra.context==='Mentioned you') {
+            let parentPostID = mention.destination.split('media?id=')[1]
+            parentPostID = parentPostID.split('_' + mention.profile_id)[0]
+            let post = await threadsAPI.getThreads(parentPostID);
+            let caption = post.containing_thread.thread_items[0].post.caption.text
+            const res = await api.sendMessage(`write a sarcastic joke to "${caption}"`)
+            const response = res.text
 
 
-          //delay for 1 minute
-          await delay(60000);
+            //delay for 1 minute
+            await delay(60000);
 
-          //reply to thread
-          await threadsAPI.publish({
-            text: response,
-            parentPostID: parentPostID,
-          });
+            //reply to thread
+            await threadsAPI.publish({
+              text: response,
+              parentPostID: parentPostID,
+            });
 
-          console.log(colors.info(`Replied: ${response}`))
+            console.log(colors.info(`Replied to post: ${parentPostID}`) )
+          }
         }
         ///mark notifications as seen
         await threadsAPI.setNotificationsSeen()
