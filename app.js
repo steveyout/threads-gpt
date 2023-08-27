@@ -46,7 +46,7 @@ cron.schedule('* * * * *', () => {
             parentPostID = parentPostID.split('_' + mention.profile_id)[0]
             let post = await threadsAPI.getThreads(parentPostID);
             let caption = post.containing_thread.thread_items[0].post.caption.text
-            const res = await api.sendMessage(`write a sarcastic joke to "${caption}"`)
+            const res = await api.sendMessage(`write a sarcastic joke to "${caption}" in plain text`)
             const response = res.text
 
 
