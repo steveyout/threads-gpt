@@ -15,12 +15,13 @@ colors.setTheme({
   error: 'red'
 });
 
-import delay from 'delay';
-import cron from 'node-cron'
 import 'dotenv/config'
 
-cron.schedule('* * * * *', () => {
-  (async () => {
+async function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
+  async function ThreadsGpt(){
     try {
       const {ThreadsAPI} = Threads;
       const api = new ChatGPTUnofficialProxyAPI({
@@ -51,7 +52,7 @@ cron.schedule('* * * * *', () => {
 
 
             //delay for 1 minute
-            await delay(60000);
+            await sleep(60000);
 
             //reply to thread
             await threadsAPI.publish({
@@ -64,10 +65,14 @@ cron.schedule('* * * * *', () => {
         }
         ///mark notifications as seen
         await threadsAPI.setNotificationsSeen()
+        await ThreadsGpt()
       }
 
     } catch (e) {
       console.error(`error: ` + e)
+      await sleep(60000);
+      await ThreadsGpt()
     }
-  })();
-})
+  }
+  ThreadsGpt();
+
