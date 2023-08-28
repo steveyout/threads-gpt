@@ -51,8 +51,8 @@ async function sleep(millis) {
             const response = res.text
 
 
-            //delay for 1 minute
-            await sleep(60000);
+            //delay for 2 minute
+            await sleep(120000);
 
             //reply to thread
             await threadsAPI.publish({
