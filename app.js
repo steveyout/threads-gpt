@@ -51,8 +51,8 @@ async function sleep(millis) {
             const response = res.text
 
 
-            //delay for 2 minute
-            await sleep(120000);
+            //delay for 4 minute
+            await sleep(240000);
 
             //reply to thread
             await threadsAPI.publish({
@@ -65,12 +65,19 @@ async function sleep(millis) {
         }
         ///mark notifications as seen
         await threadsAPI.setNotificationsSeen()
+
+
+        //delay for  4 minute
+        await sleep(240000);
+        await ThreadsGpt()
+      }else{
+        await sleep(240000);
         await ThreadsGpt()
       }
 
     } catch (e) {
       console.error(`error: ` + e)
-      await sleep(60000);
+      await sleep(240000);
       await ThreadsGpt()
     }
   }
