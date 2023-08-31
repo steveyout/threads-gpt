@@ -2,6 +2,4 @@
 A threads.net bot to automatically reply to mentions with sarcastic replies
 from chatgpt
 
-just tag (@youplexlive) into a post and wait for the magick to happen
-
-@youtgpt was rate limited by meta
+just tag  @youtgpt into a post and wait for the magick to happen
