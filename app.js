@@ -51,9 +51,6 @@ async function sleep(millis) {
             const response = res.text
 
 
-            //delay for 4 minute
-            await sleep(240000);
-
             //reply to thread
             await threadsAPI.publish({
               text: response,
@@ -61,6 +58,9 @@ async function sleep(millis) {
             });
 
             console.log(colors.info(`Replied to post: ${parentPostID}`) )
+
+            //delay for 4 minute
+            await sleep(240000);
           }
         }
         ///mark notifications as seen
