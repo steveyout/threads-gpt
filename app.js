@@ -20,18 +20,18 @@ import 'dotenv/config'
 async function sleep(millis) {
   return new Promise(resolve => setTimeout(resolve, millis));
 }
+const {ThreadsAPI} = Threads;
+const api = new ChatGPTUnofficialProxyAPI({
+  accessToken: process.env.OPENAI_ACCESS_TOKEN,
+  apiReverseProxyUrl: 'https://ai.fakeopen.com/api/conversation'
+})
+const threadsAPI = new ThreadsAPI({
+  username: process.env.THREADS_USERNAME,
+  password: process.env.THREADS_PASSWORD,
+});
 
   async function ThreadsGpt(){
     try {
-      const {ThreadsAPI} = Threads;
-      const api = new ChatGPTUnofficialProxyAPI({
-        accessToken: process.env.OPENAI_ACCESS_TOKEN,
-        apiReverseProxyUrl: 'https://ai.fakeopen.com/api/conversation'
-      })
-      const threadsAPI = new ThreadsAPI({
-        username: process.env.THREADS_USERNAME,
-        password: process.env.THREADS_PASSWORD,
-      });
       //get thread notifications
       let data = await threadsAPI.getNotifications();
       if (!data.is_last_page) {
