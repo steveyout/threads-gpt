@@ -1,5 +1,5 @@
-import { ChatGPTUnofficialProxyAPI } from 'chatgpt'
-import  Threads  from 'threads-api';
+import OpenAI from 'openai'
+import  { Client } from '@threadsjs/threads.js';
 import colors from '@colors/colors'
 // set theme
 colors.setTheme({
@@ -20,51 +20,48 @@ import 'dotenv/config'
 async function sleep(millis) {
   return new Promise(resolve => setTimeout(resolve, millis));
 }
-const {ThreadsAPI} = Threads;
-const api = new ChatGPTUnofficialProxyAPI({
-  accessToken: process.env.OPENAI_ACCESS_TOKEN,
-  apiReverseProxyUrl: 'https://ai.fakeopen.com/api/conversation'
-})
-const threadsAPI = new ThreadsAPI({
-  username: process.env.THREADS_USERNAME,
-  password: process.env.THREADS_PASSWORD,
+const threadsAPI = new Client();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_ACCESS_TOKEN,
+  baseURL: 'https://api.pawan.krd/pai-001-light-beta/v1',
 });
+await threadsAPI.login(process.env.THREADS_USERNAME, process.env.THREADS_PASSWORD,);
 
   async function ThreadsGpt(){
     try {
       //get thread notifications
-      let data = await threadsAPI.getNotifications();
-      if (!data.is_last_page) {
-        const cursor = data.next_max_id;
-        data = await threadsAPI.getNotifications(ThreadsAPI.NotificationFilter, cursor);
-      }
-
+      let data = await threadsAPI.feeds.notifications("text_post_app_mentions");
       if (data&&data.new_stories) {
         for await (let notification of data.new_stories) {
           let mention = await notification.args
-          if (mention.extra.context==='Mentioned you') {
-            let parentPostID = mention.destination.split('media?id=')[1]
-            parentPostID = parentPostID.split('_' + mention.profile_id)[0]
-            let post = await threadsAPI.getThreads(parentPostID);
-            let caption =post.containing_thread.thread_items[0].post.caption.text
-            const res = await api.sendMessage(`write a sarcastic joke to "${caption}" in plain text`)
-            const response = res.text
+          let parentPostID = mention.destination.split('media?id=')[1]
+          parentPostID = parentPostID.split('_' + mention.profile_id)[0]
+          let post = await threadsAPI.posts.fetch(parentPostID);
+          let caption = post.containing_thread.thread_items[0].post.caption.text
+          const res = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages:[{
+              role: 'user',
+              content: `write a sarcastic short tweet to "${caption}" with relevant emojis`,
+            }]
+          });
+          const response = res.choices[0].message.content
+          console.log(response);
 
 
-            //reply to thread
-            await threadsAPI.publish({
-              text: response,
-              parentPostID: parentPostID,
-            });
+          //reply to thread
+          await threadsAPI.posts.reply(mention.profile_id,{
+            contents: response,
+            post: parentPostID,
+          });
 
-            console.log(colors.info(`Replied to post: ${parentPostID}`) )
+          console.log(colors.info(`Replied to post: ${parentPostID}`))
 
-            //delay for 4 minute
-            await sleep(240000);
-          }
+          //delay for 4 minute
+          await sleep(240000);
         }
         ///mark notifications as seen
-        await threadsAPI.setNotificationsSeen()
+        await threadsAPI.feeds.notificationseen()
 
 
         //delay for  4 minute
